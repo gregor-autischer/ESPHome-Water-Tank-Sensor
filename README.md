@@ -43,10 +43,6 @@ This robust housing system includes:
     - Echo → GPIO 14
 3. Assemble everything and fasten it to the lid with M4 screws
 
-### Software Setup
-
-ESPHome configuration instructions will be added here.
-
 ## License
 
 Apache License 2.0
