@@ -31,6 +31,22 @@ This robust housing system includes:
 - Outer housing for weather protection
 - Mounting template for tank lid installation
 
+## Installation
+
+### Hardware Assembly
+
+1. Insert the ESP32 into the inner housing
+2. Connect the ultrasonic sensor:
+    - Vcc → 3V3
+    - GND → GND
+    - Trig → GPIO 12
+    - Echo → GPIO 14
+3. Assemble everything and fasten it to the lid with M4 screws
+
+### Software Setup
+
+ESPHome configuration instructions will be added here.
+
 ## License
 
 Apache License 2.0
