@@ -1,31 +1,36 @@
 # ESPHome Water Tank Sensor
 
-A water tank sensor project using ESPHome for monitoring water levels.
+ESPHome configuration code for monitoring water tank levels using ESP32 and HC-SR04 ultrasonic sensor.
 
 ## Description
 
-This project provides an ESPHome configuration for monitoring water tank levels using ultrasonic sensors or other compatible hardware.
+This project provides ESPHome configuration code for creating a smart water tank level sensor using an ESP32 microcontroller and HC-SR04 ultrasonic sensor. Perfect for home automation integration with Home Assistant.
 
 ## Features
 
 - Real-time water level monitoring
 - Integration with Home Assistant
 - Configurable alerts and notifications
+- WiFi connectivity for remote monitoring
+- Battery-friendly deep sleep support
 
-## Getting Started
+## Hardware Requirements
 
-More documentation coming soon...
+- ESP32 development board
+- HC-SR04 ultrasonic sensor
+- Waterproof housing (see 3D Print Model below)
+- M5 bolts and nuts for mounting
 
-## Requirements
+## 3D Print Model
 
-- ESPHome
-- Compatible ESP32/ESP8266 device
-- Ultrasonic sensor (HC-SR04 or similar)
+My 3D printable housing is available here:
+[ESP32 Ultrasonic Water Level Sensor Housing](https://www.printables.com/model/1333286-esp32-ultrasonic-water-level-sensor-housing-with-h)
 
-## Installation
-
-Instructions will be added here.
+This robust housing system includes:
+- Inner housing for ESP32 and HC-SR04
+- Outer housing for weather protection
+- Mounting template for tank lid installation
 
 ## License
 
-To be determined.
+Apache License 2.0

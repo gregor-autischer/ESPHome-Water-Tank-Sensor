@@ -1,0 +1,117 @@
+esphome:
+  name: esphome-web-ef49d8
+  friendly_name: Water-Tank-Sensor-ESP32
+  min_version: 2024.11.0
+  name_add_mac_suffix: false
+
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+# Allow Over-The-Air updates
+ota:
+- platform: esphome
+
+wifi:
+  ssid: "CHANGE TO YOUR NETWORK NAME"
+  password: "CHANGE TO YOUR NETWORK PASSWORD"
+
+# === Configurable distances from Home Assistant ===
+number:
+  - platform: template
+    name: "Tank Full Distance"
+    id: tank_full_distance
+    optimistic: true
+    restore_value: true 
+    initial_value: 2.0
+    min_value: 0.0
+    max_value: 100.0
+    step: 0.1
+    unit_of_measurement: "cm"
+
+  - platform: template
+    name: "Tank Empty Distance"
+    id: tank_empty_distance
+    optimistic: true
+    restore_value: true 
+    initial_value: 80.0
+    min_value: 0.0
+    max_value: 200.0
+    step: 0.1
+    unit_of_measurement: "cm"
+
+# === Sensors ===
+sensor:
+  # Raw ultrasonic sensor (reads in meters – hidden from HA)
+  - platform: ultrasonic
+    trigger_pin: GPIO12
+    echo_pin: GPIO14
+    id: ultrasonic_m
+    internal: true
+    update_interval: 5s
+    filters:
+      # 1) Reject spikes by median of last 10 values
+      - median:
+          window_size: 10
+
+  # Convert ultrasonic reading from meters to centimeters (visible)
+  - platform: template
+    name: "Ultrasonic Distance"
+    id: ultrasonic_cm
+    unit_of_measurement: "cm"
+    accuracy_decimals: 1
+    state_class: measurement
+    update_interval: 5s
+    lambda: |-
+      if (isnan(id(ultrasonic_m).state)) {
+        return NAN;
+      }
+      return id(ultrasonic_m).state * 100.0;
+
+  # Compute tank level as a percentage (0–100% based on configurable full/empty distances)
+  - platform: template
+    name: "Water Tank Level"
+    unit_of_measurement: "%"
+    accuracy_decimals: 0
+    state_class: measurement
+    update_interval: 5s
+
+    filters:
+      # 1) moving-average over last 10 samples (≈50 s smoothing)
+      - sliding_window_moving_average:
+          window_size: 20
+          send_every: 1
+          send_first_at: 1
+      # 2) only send updates when level changes by ≥1%
+      - delta:
+          value: 1.0
+
+    lambda: |-
+      // Make sure all needed sensor values are valid
+      if (isnan(id(ultrasonic_cm).state) ||
+          isnan(id(tank_full_distance).state) ||
+          isnan(id(tank_empty_distance).state)) {
+        return NAN;
+      }
+      
+      float full = id(tank_full_distance).state;
+      float empty = id(tank_empty_distance).state;
+      float d = id(ultrasonic_cm).state;
+      
+      // Calculate raw percent (if d is less than full, the value will exceed 100%)
+      float percent = 100.0 * (empty - d) / (empty - full);
+      
+      // Clamp the percentage between 0 and 100
+      if (percent < 0)
+        percent = 0;
+      if (percent > 100)
+        percent = 100;
+      
+      return round(percent);
